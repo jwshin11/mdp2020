@@ -1,11 +1,11 @@
 {
-    "normal_train": [ "swat/1005/swat.pcap" ],
+    "normal_train": [ "swat/1005/swat2.pcap",
+                      "swat/1005/swat4.pcap" ],
     "abnormal_train": [ "swat/1030/swat2.pcap",
-                        "swat/1230/swat1.pcap" ],
+                        "swat/1230/swat3.pcap" ],
     "normal_test": [ "swat/1005/swat5.pcap" ],
-    "abnormal_test": [ "swat/1030/swat1.pcap",
-                       "swat/1230/swat3.pcap" ],
-    "train_num_frames_per_file": 1000,
-    "test_num_frames_per_file": 100,
-    "window_size": 50
+    "abnormal_test": [ "swat/1030/swat1.pcap" ],
+    "train_num_frames_per_file": 8000,
+    "test_num_frames_per_file": 15000,
+    "window_size": 300
 }

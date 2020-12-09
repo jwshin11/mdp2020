@@ -158,33 +158,27 @@ def window_main():
     print(pred)
 
 def run_svm(X_train, y_train, X_test, y_test):
-    # # Train
-    # clf = svm.SVC(gamma='auto')
-    # clf.fit(X_train, y_train)
+    # Train
+    clf = svm.SVC(kernel='linear')
+    clf.fit(X_train, y_train)
 
-    # # Test
-    # pred = clf.predict(X_test)
-    # accuracy_score = sklm.accuracy_score(y_test, pred)
-    # print(accuracy_score)
-    for i in range(25):
-        c = 10 ** np.random.uniform(-3, 3)
-        r = 10 ** np.random.uniform(-3, 3)
-        clf = svm.SVC(kernel='poly', degree=2, C=c, coef0=r, class_weight='balanced', gamma='auto')
-        clf.fit(X_train, y_train)
-        pred = clf.predict(X_test)
-        accuracy_score = sklm.accuracy_score(y_test, pred)
-        print(accuracy_score)
+    # Test
+    pred = clf.predict(X_test)
+    accuracy_score = sklm.accuracy_score(y_test, pred)
+    print(accuracy_score)
 
 
 def run_one_class_svm(X_train, X_test, y_test):
     # Train
-    clf = svm.OneClassSVM(gamma='auto')
+    clf = svm.OneClassSVM(kernel='linear', nu=0.001)
     clf.fit(X_train)
 
     # Test
     pred = clf.predict(X_test)
     accuracy_score = sklm.accuracy_score(y_test, pred)
+    print(len(y_test))
     print(y_test)
+    print(len(pred))
     print(pred)
     print(accuracy_score)
 
@@ -202,12 +196,14 @@ def actual_main():
     window_size = config['window_size']
 
     # Get windows from train set
+    print('Getting training data...')
     normal_X_train, normal_y_train = get_window_features(normal_train_file_list, train_num_frames_per_file, window_size, 1)
     abnormal_X_train, abnormal_y_train = get_window_features(abnormal_train_file_list, train_num_frames_per_file, window_size, -1)
     X_train = normal_X_train + abnormal_X_train
     y_train = normal_y_train + abnormal_y_train
 
     # Get windows from test set
+    print('Getting testing data...')
     normal_X_test, normal_y_test = get_window_features(normal_test_file_list, test_num_frames_per_file, window_size, 1)
     abnormal_X_test, abnormal_y_test = get_window_features(abnormal_test_file_list, test_num_frames_per_file, window_size, -1)
     X_test = normal_X_test + abnormal_X_test
@@ -215,12 +211,13 @@ def actual_main():
 
     # Train and test different models
     # SVM
-    run_svm(X_train, y_train, X_test, y_test)
+    print('Running SVM')
+    # run_svm(X_train, y_train, X_test, y_test)
 
     # One-Class SVM
-    # run_one_class_svm(X_train, X_test, y_test)
-
-    print(X_train)
+    print('Running One-Class SVM')
+    run_one_class_svm(normal_X_train, abnormal_X_test, abnormal_y_test)
+    
 
 if __name__ == '__main__':
     actual_main()

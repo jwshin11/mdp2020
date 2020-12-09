@@ -82,13 +82,15 @@ def get_features(file_list, num_frames):
 def get_window_features(file_list, num_frames, window_size, label):
     window_list = []
     labels = []
-    frame_count = 0
-
+    
     for filename in file_list:
         print(filename)
         f = open(filename, 'rb')
         pcap = dpkt.pcap.Reader(f)
         window = []
+        n = 0
+        is_first_window = True
+        frame_count = 0
         
         for (ts, buf) in pcap:
             if frame_count == num_frames:
@@ -99,29 +101,25 @@ def get_window_features(file_list, num_frames, window_size, label):
                 eth = dpkt.ethernet.Ethernet(buf)
                 ip = eth.data
                 tcp = ip.data
-                if not isinstance(ip, dpkt.ip.IP) or not isinstance(tcp, dpkt.tcp.TCP):
+                if not isinstance(ip, dpkt.ip.IP):
                     continue
-
-                # if len(window_list) == 0:
-                #     if len(window) != window_size:
-                #         window.append(ip.len)
-                #     else:
-                #         window_list.append(window)
-                #         labels.append(label)
-                # else:
-                #     window.pop(0)
-                #     window.append(ip.len)
-                #     window_list.append(window)
-                #     labels.append(label)
-
-                if len(window) == window_size:
-                    window_list.append(window)
-                    window = []
-                    labels.append(label)
+                
+                if is_first_window:
+                    window.append(ip.len)
+                    if len(window) == window_size: 
+                        window_list.append(list(window))
+                        labels.append(label)
+                        is_first_window = False
                 else:
-                    window.append(tcp.flags)
-                    print(tcp.flags)
+                    window.pop(0)
+                    window.append(ip.len)
+                    n += 1
+                    if n == int(6*window_size):
+                        window_list.append(list(window))
+                        labels.append(label)
+                        n = 0
+
             except:
                 continue
-    
+
     return window_list, labels
